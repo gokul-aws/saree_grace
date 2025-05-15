@@ -20,50 +20,58 @@ import AdminProducts from "@/pages/admin/products";
 import AdminOrders from "@/pages/admin/orders";
 import AdminCustomers from "@/pages/admin/customers";
 import { useAuth } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import { CartProvider } from "./contexts/CartContext";
 
-function AppRoutes() {
+// The inner component that uses the Auth and Cart providers
+function InnerApp() {
   const { user } = useAuth();
   
   return (
-    <Switch>
-      <Route path="/" component={Home} />
-      <Route path="/products" component={Products} />
-      <Route path="/products/:id" component={ProductDetail} />
-      <Route path="/cart" component={Cart} />
-      <Route path="/checkout" component={Checkout} />
-      <Route path="/account" component={Account} />
-      <Route path="/login" component={Login} />
-      <Route path="/register" component={Register} />
-      
-      {/* Admin Routes - protected */}
-      {user?.isAdmin && (
-        <>
-          <Route path="/admin" component={AdminDashboard} />
-          <Route path="/admin/products" component={AdminProducts} />
-          <Route path="/admin/orders" component={AdminOrders} />
-          <Route path="/admin/customers" component={AdminCustomers} />
-        </>
-      )}
-      
-      {/* Fallback to 404 */}
-      <Route component={NotFound} />
-    </Switch>
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-grow">
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/products" component={Products} />
+          <Route path="/products/:id" component={ProductDetail} />
+          <Route path="/cart" component={Cart} />
+          <Route path="/checkout" component={Checkout} />
+          <Route path="/account" component={Account} />
+          <Route path="/login" component={Login} />
+          <Route path="/register" component={Register} />
+          
+          {/* Admin Routes - protected */}
+          {user?.isAdmin && (
+            <>
+              <Route path="/admin" component={AdminDashboard} />
+              <Route path="/admin/products" component={AdminProducts} />
+              <Route path="/admin/orders" component={AdminOrders} />
+              <Route path="/admin/customers" component={AdminCustomers} />
+            </>
+          )}
+          
+          {/* Fallback to 404 */}
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+      <Footer />
+      <CartDrawer />
+    </div>
   );
 }
 
+// Main App component that sets up providers
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="flex-grow">
-            <AppRoutes />
-          </main>
-          <Footer />
-        </div>
-        <CartDrawer />
-        <Toaster />
+        <AuthProvider>
+          <CartProvider>
+            <InnerApp />
+            <Toaster />
+          </CartProvider>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

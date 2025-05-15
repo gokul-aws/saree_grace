@@ -12,15 +12,20 @@ interface StarRatingProps {
 }
 
 export function StarRating({
-  rating,
+  rating = 0,
   maxRating = 5,
   size = 'md',
   showScore = false,
   reviewCount,
   className,
 }: StarRatingProps) {
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 >= 0.5;
+  // Ensure rating is a valid number and within bounds
+  const validRating = isNaN(rating) ? 0 : Math.max(0, Math.min(rating, maxRating));
+  
+  // Calculate star counts
+  const fullStars = Math.floor(validRating);
+  const hasHalfStar = validRating % 1 >= 0.5;
+  const emptyStars = Math.max(0, maxRating - fullStars - (hasHalfStar ? 1 : 0));
   
   const sizeClasses = {
     sm: 'h-3 w-3',
@@ -30,10 +35,14 @@ export function StarRating({
   
   const starSize = sizeClasses[size];
   
+  // Create arrays of correct length for rendering
+  const fullStarsArray = Array(fullStars).fill(null);
+  const emptyStarsArray = Array(emptyStars).fill(null);
+  
   return (
     <div className={cn("flex items-center", className)}>
       <div className="flex">
-        {[...Array(fullStars)].map((_, i) => (
+        {fullStarsArray.map((_, i) => (
           <StarIcon key={`full-${i}`} className={cn(starSize, "text-yellow-400 fill-yellow-400")} />
         ))}
         
@@ -41,14 +50,14 @@ export function StarRating({
           <StarHalfIcon className={cn(starSize, "text-yellow-400 fill-yellow-400")} />
         )}
         
-        {[...Array(maxRating - fullStars - (hasHalfStar ? 1 : 0))].map((_, i) => (
+        {emptyStarsArray.map((_, i) => (
           <StarIcon key={`empty-${i}`} className={cn(starSize, "text-yellow-400")} />
         ))}
       </div>
       
       {showScore && (
         <span className="text-sm text-gray-500 ml-2">
-          {rating.toFixed(1)}
+          {validRating.toFixed(1)}
           {reviewCount !== undefined && ` (${reviewCount})`}
         </span>
       )}
