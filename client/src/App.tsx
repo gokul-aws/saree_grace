@@ -21,7 +21,7 @@ import AdminOrders from "@/pages/admin/orders";
 import AdminCustomers from "@/pages/admin/customers";
 import { useAuth } from "./contexts/AuthContext";
 
-function Router() {
+function AppRoutes() {
   const { user } = useAuth();
   
   return (
@@ -58,7 +58,7 @@ function App() {
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-grow">
-            <Router />
+            <AppRoutes />
           </main>
           <Footer />
         </div>
